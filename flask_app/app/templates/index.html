@@ -1,11 +1,8 @@
 <html>
   <head>
-    <title>{{ title }} - image</title>
+    <title>{{ title }}</title>
   </head>
   <body>
-    <img src="{{ url_for('fig') }}" alt="Image Placeholder" height="600">
-    <div class=page>
-        {{ table|safe }}
-    </div>
+    <div>Click <a href={{ authorize_url }}>here</a> to authenticate with Strava.</div>
   </body>
 </html>
