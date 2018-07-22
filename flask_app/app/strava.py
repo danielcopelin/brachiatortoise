@@ -6,17 +6,15 @@ import matplotlib.pyplot as plt
 import matplotlib
 #matplotlib.use('Agg')
 
-def get_new_activities(h5):
+def get_new_activities(client, h5=None):
     print("Getting new activities...")
     
+    if h5:
     with pd.HDFStore(h5) as store:
         df = store['club_df']
+    else:
+        df = pd.DataFrame()
     
-    client = stravalib.client.Client()
-    access_token = ''
-    client.access_token = access_token
-    # athlete = client.get_athlete()
-        
     club_activities = client.get_club_activities(329445)
     for activity in club_activities:
         if activity.start_date_local.year != 2018:
@@ -37,12 +35,11 @@ def get_new_activities(h5):
             for k, v in act_dict.items():
                 df.loc[activity.id, k] = v
 
-    cumulative(df, 'athlete_id', 'distance', 'start_date_local')
-    cumulative(df, 'athlete_id', 'total_elevation_gain', 'start_date_local')
-    cumulative(df, 'athlete_id', 'moving_time', 'start_date_local')    
+    df.loc[df[athlete_field] == athlete,'cumulative_{0}'.format('distance')] = cumulative(df, 'athlete_id', 'distance', 'start_date_local')
+    df.loc[df[athlete_field] == athlete,'cumulative_{0}'.format('total_elevation_gain')] = cumulative(df, 'athlete_id', 'total_elevation_gain', 'start_date_local')
+    df.loc[df[athlete_field] == athlete,'cumulative_{0}'.format('moving_time')] = cumulative(df, 'athlete_id', 'moving_time', 'start_date_local')    
     
-    with pd.HDFStore(h5) as store:
-        store['club_df'] = df
+    return df
             
 def cumulative(df, athlete_field, data_field, date):
     '''Calculates the to-date cumulative sum of the athlete's data for each activity.'''
